@@ -11,6 +11,7 @@ class ProveedorAdmin(admin.ModelAdmin):
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
     actions_on_bottom = True
+    list_per_page = 25
     fieldsets = (
         (None, {
             'fields': (
