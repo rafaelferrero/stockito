@@ -1,15 +1,16 @@
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 
 class Entidad(models.Model):
     telefono = models.CharField(
         max_length=20,
-        verbose_name="Teléfono",
-        help_text="Ej.: +549 (3564) 55-4433",
+        verbose_name=_("Teléfono"),
+        help_text=_("Ej.: +549 (3564) 55-4433"),
         blank=True,
     )
     email = models.EmailField(
-        verbose_name="E-Mail",
+        verbose_name=_("E-Mail"),
     )
 
     class Meta:
@@ -19,11 +20,11 @@ class Entidad(models.Model):
 class Cliente(Entidad):
     nombre = models.CharField(
         max_length=255,
-        verbose_name="Nombre",
+        verbose_name=_("Nombre"),
     )
     apellido = models.CharField(
         max_length=255,
-        verbose_name="Apellido",
+        verbose_name=_("Apellido"),
     )
 
     def __str__(self):
@@ -36,16 +37,17 @@ class Cliente(Entidad):
 class Proveedor(Entidad):
     cuit = models.CharField(
         max_length=13,
-        verbose_name="CUIT",
-        help_text="Ej.: 30-12345678-5",
+        verbose_name=_("CUIT"),
+        help_text=_("Ej.: 30-12345678-5"),
         blank=True,
     )
     razon_social = models.CharField(
         max_length=255,
-        verbose_name="Razón Social",
+        verbose_name=_("Razón Social"),
     )
     nombre_fantasia = models.CharField(
         max_length=255,
+        verbose_name=_("Nombre de Fantasía"),
         blank=True,
     )
 
