@@ -19,6 +19,11 @@ class Deposito(models.Model):
         help_text=_("Ej. Estantería 01"),
     )
 
+    class Meta:
+        verbose_name = _("Deposito")
+        verbose_name_plural = _("Depósitos")
+        ordering = ['deposito', 'identificacion']
+
     def __str__(self):
         deposito=""
         if self.deposito:
@@ -52,6 +57,11 @@ class Articulo(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    class Meta:
+        verbose_name = _("Artículo")
+        verbose_name_plural = _("Artículos")
+        ordering = ['codigo', 'proveedor']
+
     def __str__(self):
         return "{} - {}".format(
             self.codigo,
@@ -78,6 +88,11 @@ class Ubicacion(models.Model):
         on_delete=models.PROTECT,
     )
 
+    class Meta:
+        verbose_name = _("Ubicación")
+        verbose_name_plural = _("Ubicaciones")
+        ordering = ['ubicacion', 'articulo']
+
     def __str__(self):
         return "{}".format(self.ubicacion.identificacion)
 
@@ -93,6 +108,11 @@ class Movimiento(models.Model):
     cantidad = models.SmallIntegerField(
         verbose_name=_("Cantidad"),
     )
+
+    class Meta:
+        verbose_name = _("Movimiento")
+        verbose_name_plural = _("Movimientos")
+        ordering = ['articulo']
 
     def __str__(self):
         return "{} cantidad: {}".format(
