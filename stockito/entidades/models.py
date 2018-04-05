@@ -28,6 +28,11 @@ class Cliente(Entidad):
         verbose_name=_("Apellido"),
     )
 
+    class Meta:
+        verbose_name = _("Cliente")
+        verbose_name_plural = _("Clientes")
+        ordering = ['apellido', 'nombre']
+
     def __str__(self):
         return "{}, {}".format(
             self.apellido.upper(),
@@ -51,6 +56,11 @@ class Proveedor(Entidad):
         verbose_name=_("Nombre de Fantasía"),
         blank=True,
     )
+
+    class Meta:
+        verbose_name = _("Proveedor")
+        verbose_name_plural = _("Proveedores")
+        ordering = ['razon_social']
 
     @property
     def nombre_completo(self):

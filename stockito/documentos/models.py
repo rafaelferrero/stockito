@@ -21,6 +21,8 @@ class Documento(models.Model):
 
     class Meta:
         abstract = True
+        verbose_name = _("Documento")
+        verbose_name_plural = _("Documentos")
 
 
 class DocumentoIngreso(Documento):
@@ -58,6 +60,11 @@ class DocumentoIngreso(Documento):
         blank=True,
     )
 
+    class Meta:
+        verbose_name = _("Documento Ingreso")
+        verbose_name_plural = _("Documentos de Ingreso")
+        ordering = ['-fecha', 'proveedor']
+
     def __str__(self):
         return "Factura {} {}-{} del {} ({})".format(
             self.letra,
@@ -83,6 +90,11 @@ class DocumentoEgreso(Documento):
         help_text=_("Motivo de la extracción"),
     )
 
+    class Meta:
+        verbose_name = _("Documento Egreso")
+        verbose_name_plural = _("Documentos de Egreso")
+        ordering = ['-fecha', 'cliente']
+
     def __str__(self):
         return "{} {}".format(
             self.cliente,
@@ -99,6 +111,10 @@ class Ingreso(Movimiento):
         on_delete=models.PROTECT,
     )
 
+    class Meta:
+        verbose_name = _("Ingreso")
+        verbose_name_plural = _("Ingresos")
+
 
 class Egreso(Movimiento):
     documento = models.ForeignKey(
@@ -108,6 +124,10 @@ class Egreso(Movimiento):
         related_query_name="documento_egreso",
         on_delete=models.PROTECT,
     )
+
+    class Meta:
+        verbose_name = _("Egreso")
+        verbose_name_plural = _("Egresos")
 
     def save(self, *args, **kwargs):
         if not self.pk:
