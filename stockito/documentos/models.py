@@ -29,21 +29,26 @@ class DocumentoIngreso(Documento):
         related_name="proveedores_documentoingreso",
         related_query_name="proveedor_documentoingreso",
         verbose_name=_("Proveedor"),
-        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     letra = models.CharField(
         max_length=1,
         choices=LETRA,
         default=LETRA[0][0],
-        help_text=_("Letra de la factura de Compra")
+        help_text=_("Letra de la factura de Compra"),
+        blank=True,
     )
     punto_venta = models.CharField(
         max_length=4,
-        help_text=_("Punto de venta de la factura de Compra")
+        help_text=_("Punto de venta de la factura de Compra"),
+        blank=True,
     )
     numero = models.CharField(
         max_length=8,
-        help_text=_("Número de la factura de Compra")
+        help_text=_("Número de la factura de Compra"),
+        blank=True,
     )
     importe = models.DecimalField(
         max_digits=8,
@@ -103,3 +108,8 @@ class Egreso(Movimiento):
         related_query_name="documento_egreso",
         on_delete=models.PROTECT,
     )
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.cantidad = self.cantidad * (-1)
+        super(Movimiento, self).save(*args, **kwargs)

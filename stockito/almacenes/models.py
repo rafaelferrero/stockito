@@ -47,7 +47,9 @@ class Articulo(models.Model):
             "Si el mismo artículo lo proveen empresas distintas"
             " es preferible cargar dos artículos distintos"
         ),
-        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
 
     def __str__(self):
