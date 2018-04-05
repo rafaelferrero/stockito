@@ -6,9 +6,12 @@ from entidades.models import Proveedor
 class Deposito(models.Model):
     deposito = models.ForeignKey(
         'Deposito',
-        related_name="deposito_deposito",
+        related_name="depositos_hijos",
+        related_query_name="deposito_hijo",
         verbose_name=_("Depósito Padre"),
         blank=True,
+        null=True,
+        on_delete=models.PROTECT,
     )
     identificacion = models.CharField(
         max_length=255,
@@ -37,12 +40,16 @@ class Articulo(models.Model):
     )
     proveedor = models.ForeignKey(
         Proveedor,
-        related_name="proveedor_articulo",
+        related_name="proveedores_articulo",
+        related_query_name="proveedor_articulo",
         verbose_name=_("Proveedor"),
         help_text=_(
             "Si el mismo artículo lo proveen empresas distintas"
             " es preferible cargar dos artículos distintos"
-        )
+        ),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
 
     def __str__(self):
@@ -57,13 +64,18 @@ class Ubicacion(models.Model):
         Deposito,
         verbose_name=_("Ubicación."),
         help_text=_("Ubicación donde se almacena el artículo en el Depósito"),
-        related_name="deposito_ubicacion",
+        related_name="ubicaciones_deposito",
+        related_query_name="ubicacion_deposito",
         blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     articulo = models.ForeignKey(
         Articulo,
         verbose_name=_("Artículo"),
-        related_name="articulo_ubicacion",
+        related_name="articulos_ubicacion",
+        related_query_name="articulo_ubicacion",
+        on_delete=models.PROTECT,
     )
 
     def __str__(self):
@@ -73,14 +85,14 @@ class Ubicacion(models.Model):
 class Movimiento(models.Model):
     articulo = models.ForeignKey(
         Articulo,
-        verbose_name=_("Artículo")
+        verbose_name=_("Artículo"),
+        related_name="movimientos_articulo",
+        related_query_name="movimiento_articulo",
+        on_delete=models.PROTECT,
     )
     cantidad = models.SmallIntegerField(
-        verbose_name=_("Cantidad")
+        verbose_name=_("Cantidad"),
     )
-
-    class Meta:
-        abstract = True
 
     def __str__(self):
         return "{} cantidad: {}".format(
