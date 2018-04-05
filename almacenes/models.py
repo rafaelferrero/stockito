@@ -68,3 +68,22 @@ class Ubicacion(models.Model):
 
     def __str__(self):
         return "{}".format(self.ubicacion.identificacion)
+
+
+class Movimiento(models.Model):
+    articulo = models.ForeignKey(
+        Articulo,
+        verbose_name=_("Artículo")
+    )
+    cantidad = models.SmallIntegerField(
+        verbose_name=_("Cantidad")
+    )
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return "{} cantidad: {}".format(
+            self.articulo,
+            self.cantidad,
+        )
