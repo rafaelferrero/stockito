@@ -11,6 +11,7 @@ class Entidad(models.Model):
     )
     email = models.EmailField(
         verbose_name=_("E-Mail"),
+        blank=True,
     )
 
     class Meta:
@@ -30,7 +31,7 @@ class Cliente(Entidad):
     def __str__(self):
         return "{}, {}".format(
             self.apellido.upper(),
-            self.nombre.tittle(),
+            self.nombre.title(),
         )
 
 
@@ -53,11 +54,11 @@ class Proveedor(Entidad):
 
     @property
     def nombre_completo(self):
-        r = self.razon_social.tittle()
+        r = self.razon_social.title()
         if self.cuit:
             c = "( {} )".format(self.cuit)
         if self.nombre_fantasia:
-            n = "{}".format(self.nombre_fantasia.tittle())
+            n = "{}".format(self.nombre_fantasia.title())
 
         if c and n:
             identificacion = "'{}' - {} {}".format(n, r, c)
@@ -71,4 +72,4 @@ class Proveedor(Entidad):
         return identificacion
 
     def __str__(self):
-        return "{}".format(self.razon_social.tittle())
+        return "{}".format(self.razon_social.title())
