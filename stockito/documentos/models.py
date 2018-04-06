@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from entidades.models import Proveedor, Cliente
 from almacenes.models import Movimiento
@@ -39,18 +40,22 @@ class DocumentoIngreso(Documento):
         max_length=1,
         choices=LETRA,
         default=LETRA[0][0],
-        help_text=_("Letra de la factura de Compra"),
         blank=True,
+        null=True,
     )
     punto_venta = models.CharField(
         max_length=4,
+        verbose_name=_("Punto de Venta"),
         help_text=_("Punto de venta de la factura de Compra"),
         blank=True,
+        null=True,
     )
     numero = models.CharField(
         max_length=8,
+        verbose_name=_("Número"),
         help_text=_("Número de la factura de Compra"),
         blank=True,
+        null=True,
     )
     importe = models.DecimalField(
         max_digits=8,
@@ -58,6 +63,7 @@ class DocumentoIngreso(Documento):
         verbose_name=_("Importe"),
         help_text=_("Importe final de la factura"),
         blank=True,
+        null=True,
     )
 
     class Meta:
@@ -66,13 +72,45 @@ class DocumentoIngreso(Documento):
         ordering = ['-fecha', 'proveedor']
 
     def __str__(self):
-        return "Factura {} {}-{} del {} ({})".format(
-            self.letra,
-            "0" * (4 - len(self.punto_venta.strip())) + self.punto_venta.strip(),
-            "0" * (8 - len(self.numero.strip())) + self.numero.strip(),
+        if not self.punto_venta:
+            self.punto_venta = ''
+        if not self.numero:
+            self.numero = ''
+
+        valor = ''
+        if self.letra and self.punto_venta and self.numero:
+            valor = "Factura {} {}-{} del ".format(
+                self.letra,
+                "0" * (4 - len(self.punto_venta.strip())) + self.punto_venta.strip(),
+                "0" * (8 - len(self.numero.strip())) + self.numero.strip(),
+            )
+
+        return valor + "{} ({})".format(
             self.fecha,
             self.proveedor,
         )
+
+    def clean(self):
+        if self.punto_venta and not self.numero:
+            raise ValidationError(
+                {'numero':
+                 _("Si decide indicar una factura de compra,"
+                   " no omita el número de la misma")})
+        if not self.punto_venta and self.numero:
+            raise ValidationError(
+                {'punto_venta':
+                 _("Si decide indicar una factura de compra,"
+                   " no omita el punto de venta de la misma")})
+        if self.punto_venta and self.numero and not self.letra:
+            raise ValidationError(
+                {'letra':
+                 _("Si decide indicar una factura de compra,"
+                   " no omita la letra de la misma")})
+
+    def save(self, *args, **kwargs):
+        if not self.punto_venta and not self.numero:
+            self.letra = ''
+        super(DocumentoIngreso, self).save(*args, **kwargs)
 
 
 class DocumentoEgreso(Documento):
