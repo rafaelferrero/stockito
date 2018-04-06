@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from entidades.models import Proveedor, Cliente
-from almacenes.models import Movimiento
+from almacenes.models import Articulo
 from documentos.choices import LETRA
 
 
@@ -137,6 +137,30 @@ class DocumentoEgreso(Documento):
         return "{} {}".format(
             self.cliente,
             self.fecha,
+        )
+
+
+class Movimiento(models.Model):
+    articulo = models.ForeignKey(
+        Articulo,
+        verbose_name=_("Artículo"),
+        related_name="movimientos_articulo",
+        related_query_name="movimiento_articulo",
+        on_delete=models.PROTECT,
+    )
+    cantidad = models.SmallIntegerField(
+        verbose_name=_("Cantidad"),
+    )
+
+    class Meta:
+        verbose_name = _("Movimiento")
+        verbose_name_plural = _("Movimientos")
+        ordering = ['articulo']
+
+    def __str__(self):
+        return "{} cantidad: {}".format(
+            self.articulo,
+            self.cantidad,
         )
 
 

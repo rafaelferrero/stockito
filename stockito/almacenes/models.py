@@ -95,27 +95,3 @@ class Ubicacion(models.Model):
 
     def __str__(self):
         return "{}".format(self.ubicacion.identificacion)
-
-
-class Movimiento(models.Model):
-    articulo = models.ForeignKey(
-        Articulo,
-        verbose_name=_("Artículo"),
-        related_name="movimientos_articulo",
-        related_query_name="movimiento_articulo",
-        on_delete=models.PROTECT,
-    )
-    cantidad = models.SmallIntegerField(
-        verbose_name=_("Cantidad"),
-    )
-
-    class Meta:
-        verbose_name = _("Movimiento")
-        verbose_name_plural = _("Movimientos")
-        ordering = ['articulo']
-
-    def __str__(self):
-        return "{} cantidad: {}".format(
-            self.articulo,
-            self.cantidad,
-        )
