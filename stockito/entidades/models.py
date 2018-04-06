@@ -8,10 +8,12 @@ class Entidad(models.Model):
         verbose_name=_("Teléfono"),
         help_text=_("Ej.: +549 (3564) 55-4433"),
         blank=True,
+        null=True,
     )
     email = models.EmailField(
         verbose_name=_("E-Mail"),
         blank=True,
+        null=True,
     )
 
     class Meta:
@@ -46,6 +48,7 @@ class Proveedor(Entidad):
         verbose_name=_("CUIT"),
         help_text=_("Ej.: 30-12345678-5"),
         blank=True,
+        null=True,
     )
     razon_social = models.CharField(
         max_length=255,
@@ -55,6 +58,7 @@ class Proveedor(Entidad):
         max_length=255,
         verbose_name=_("Nombre de Fantasía"),
         blank=True,
+        null=True,
     )
 
     class Meta:
