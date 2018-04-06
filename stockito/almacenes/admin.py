@@ -4,12 +4,58 @@ from almacenes.models import Articulo, Deposito, Ubicacion, Movimiento
 
 @admin.register(Articulo)
 class ArticuloAdmin(admin.ModelAdmin):
-    pass
+    actions_on_bottom = True
+    list_per_page = 25
+    fieldsets = (
+        (None, {
+            'fields': (
+                (
+                    'proveedor',
+                    'codigo',
+                ),
+                'descripcion',
+            )
+        }),
+    )
+    list_display = (
+        'codigo',
+        'descripcion',
+        'proveedor',
+    )
+    list_filter = (
+        'proveedor',
+    )
+    search_fields = (
+        'codigo',
+        'descripcion',
+        'proveedor__razon_social',
+        'proveedor__nombre_fantasia',
+    )
 
 
 @admin.register(Deposito)
 class DepositoAdmin(admin.ModelAdmin):
-    pass
+    actions_on_bottom = True
+    list_per_page = 25
+    fieldsets = (
+        (None, {
+            'fields': (
+                'identificacion',
+                'deposito',
+            )
+        }),
+    )
+    list_display = (
+        'identificacion',
+        'deposito',
+    )
+    list_filter = (
+        'deposito',
+    )
+    search_fields = (
+        'identificacion',
+        'deposito__identificacion',
+    )
 
 
 @admin.register(Ubicacion)

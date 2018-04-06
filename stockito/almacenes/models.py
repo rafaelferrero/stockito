@@ -22,7 +22,7 @@ class Deposito(models.Model):
     class Meta:
         verbose_name = _("Deposito")
         verbose_name_plural = _("Depósitos")
-        ordering = ['deposito', 'identificacion']
+        ordering = ['identificacion']
 
     def __str__(self):
         deposito=""
