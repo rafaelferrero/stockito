@@ -1,4 +1,5 @@
 ambiente/
+stockito/statics/
 .idea/
 *.sqlite3
 
