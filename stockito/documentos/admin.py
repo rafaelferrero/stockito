@@ -15,6 +15,7 @@ class IngresoInLIne(admin.TabularInline):
 @admin.register(DocumentoIngreso)
 class DocumentoIngresoAdmin(admin.ModelAdmin):
     actions_on_bottom = True
+    list_per_page = 25
     inlines = [
         IngresoInLIne,
     ]
@@ -22,8 +23,8 @@ class DocumentoIngresoAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 (
-                    'proveedor',
                     'fecha',
+                    'proveedor',
                 ),
                 )}),
         ('Campos Opcionales', {
@@ -39,6 +40,7 @@ class DocumentoIngresoAdmin(admin.ModelAdmin):
             ),
         }),
     )
+    date_hierarchy = 'fecha'
     list_display = (
         'fecha',
         'proveedor',
@@ -53,6 +55,7 @@ class DocumentoIngresoAdmin(admin.ModelAdmin):
         'numero',
         'proveedor__razon_social',
         'proveedor__nombre_fantasia',
+        'descripcion',
     )
 
     def factura(self, obj):
@@ -74,6 +77,38 @@ class EgresoInLIne(admin.TabularInline):
 
 @admin.register(DocumentoEgreso)
 class DocumentoEgresoAdmin(admin.ModelAdmin):
+    actions_on_bottom = True
+    list_per_page = 25
     inlines = [
         EgresoInLIne,
     ]
+    fieldsets = (
+        (None, {
+            'fields': (
+                (
+                    'fecha',
+                    'cliente',
+                ),
+                'motivo',
+                )}),
+        ('Campos Opcionales', {
+            'classes': ('grp-collapse grp-closed',),
+            'fields': (
+                'descripcion',
+            ),
+        }),
+    )
+    date_hierarchy = 'fecha'
+    list_display = (
+        'fecha',
+        'cliente',
+    )
+    list_filter = (
+        'cliente',
+    )
+    search_fields = (
+        'cliente__nombre',
+        'cliente__apellido',
+        'motivo',
+        'descripcion',
+    )
