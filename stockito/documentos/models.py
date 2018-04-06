@@ -191,6 +191,12 @@ class Egreso(Movimiento):
         verbose_name = _("Egreso")
         verbose_name_plural = _("Egresos")
 
+    def clean(self):
+        if not self.articulo.has_stock:
+            raise ValidationError(
+                {'articulo':
+                 _("Este artículo no tiene stock disponible")})
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.cantidad = self.cantidad * (-1)

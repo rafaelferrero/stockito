@@ -62,6 +62,12 @@ class Articulo(models.Model):
         verbose_name_plural = _("Artículos")
         ordering = ['codigo', 'proveedor']
 
+    @property
+    def has_stock(self):
+    # Todo: buscar entre todos los movimientos si la sumatoria da más de cero si la sumatoria da mas de cero devolver \
+    #   true sino false
+        return False
+
     def __str__(self):
         return "{} - {}".format(
             self.codigo,
