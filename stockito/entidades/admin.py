@@ -5,7 +5,38 @@ from entidades.models import Proveedor, Cliente
 
 @admin.register(Proveedor)
 class ProveedorAdmin(admin.ModelAdmin):
-    pass
+    actions_on_bottom = True
+    list_per_page = 25
+    fieldsets = (
+        (None, {
+            'fields': (
+                'razon_social',
+            )
+        }),
+        ('Campos Opcionales', {
+            'classes': ('grp-collapse grp-closed',),
+            'fields': (
+                'cuit',
+                'nombre_fantasia',
+                (
+                    'telefono',
+                    'email',
+                ),
+            ),
+        }),
+    )
+    list_display = (
+        'razon_social',
+        'cuit',
+        'telefono',
+        'email',
+    )
+    search_fields = (
+        'cuit',
+        'razon_social',
+        'telefono',
+        'email',
+    )
 
 
 @admin.register(Cliente)
@@ -19,11 +50,16 @@ class ClienteAdmin(admin.ModelAdmin):
                     'apellido',
                     'nombre',
                  ),
+            )
+        }),
+        ('Campos Opcionales', {
+            'classes': ('grp-collapse grp-closed',),
+            'fields': (
                 (
                     'telefono',
                     'email',
                 ),
-            )
+            ),
         }),
     )
     list_display = (
