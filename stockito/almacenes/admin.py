@@ -15,6 +15,7 @@ class DepositoAdmin(admin.ModelAdmin):
 @admin.register(Ubicacion)
 class UbicacionAdmin(admin.ModelAdmin):
     actions_on_bottom = True
+    list_per_page = 25
     fieldsets = (
         (None, {
             'fields': (
@@ -43,6 +44,7 @@ class UbicacionAdmin(admin.ModelAdmin):
 @admin.register(Movimiento)
 class MovimientoAdmin(admin.ModelAdmin):
     actions_on_bottom = True
+    list_per_page = 25
     fieldsets = (
         (None, {
             'fields': (
