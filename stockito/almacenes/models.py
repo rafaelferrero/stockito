@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from entidades.models import Proveedor
+from django.db.models import Sum
 
 
 class Deposito(models.Model):
@@ -25,7 +26,7 @@ class Deposito(models.Model):
         ordering = ['identificacion']
 
     def __str__(self):
-        deposito=""
+        deposito = ""
         if self.deposito:
             deposito = " (en {})".format(self.deposito)
 
@@ -63,10 +64,8 @@ class Articulo(models.Model):
         ordering = ['codigo', 'proveedor']
 
     @property
-    def has_stock(self):
-    # Todo: buscar entre todos los movimientos si la sumatoria da más de cero si la sumatoria da mas de cero devolver \
-    #   true sino false
-        return False
+    def disponibilidad(self):
+        return self.movimientos_articulo.all().aggregate(Sum('cantidad'))['cantidad__sum']
 
     def __str__(self):
         return "{} - {}".format(

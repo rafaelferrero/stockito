@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from entidades.models import Proveedor, Cliente
 from almacenes.models import Articulo
 from documentos.choices import LETRA
+from django.db.models import Sum
 
 
 class Documento(models.Model):
@@ -148,8 +149,13 @@ class Movimiento(models.Model):
         related_query_name="movimiento_articulo",
         on_delete=models.PROTECT,
     )
-    cantidad = models.SmallIntegerField(
+    cantidad = models.PositiveSmallIntegerField(
         verbose_name=_("Cantidad"),
+    )
+    multiplicador = models.SmallIntegerField(
+        default=1,
+        help_text=_("Si el multiplicador es positivo es un ingreso "
+                    "y si es negativo es un egreso")
     )
 
     class Meta:
@@ -192,12 +198,13 @@ class Egreso(Movimiento):
         verbose_name_plural = _("Egresos")
 
     def clean(self):
-        if not self.articulo.has_stock:
+        if not self.disponible:
             raise ValidationError(
-                {'articulo':
-                 _("Este artículo no tiene stock disponible")})
+                {'cantidad':
+                 _("Este artículo no tiene stock disponible. "
+                   "Tienes {} artículos disponibles".format(
+                     self.articulo.disponibilidad, ))})
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.cantidad = self.cantidad * (-1)
+        self.multiplicador = -1
         super(Movimiento, self).save(*args, **kwargs)
