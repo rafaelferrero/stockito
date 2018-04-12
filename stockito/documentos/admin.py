@@ -43,6 +43,7 @@ class MovimientoAdmin(admin.ModelAdmin):
 
 class IngresoInLIne(admin.TabularInline):
     model = Ingreso
+    exclude = ['multiplicador']
 
 
 @admin.register(DocumentoIngreso)
