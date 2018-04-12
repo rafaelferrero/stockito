@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 from almacenes.models import Articulo, Deposito, Ubicacion
 
 
@@ -21,6 +22,7 @@ class ArticuloAdmin(admin.ModelAdmin):
         'codigo',
         'descripcion',
         'proveedor',
+        'disponibilidad',
     )
     list_filter = (
         'proveedor',
@@ -31,6 +33,10 @@ class ArticuloAdmin(admin.ModelAdmin):
         'proveedor__razon_social',
         'proveedor__nombre_fantasia',
     )
+
+    def disponibilidad(self, obj):
+        return obj.disponibilidad
+    disponibilidad.short_description = _('Disponibilidad')
 
 
 @admin.register(Deposito)
