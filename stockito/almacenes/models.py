@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from entidades.models import Proveedor
-from django.db.models import Sum
+from django.db.models import Sum, F, ExpressionWrapper, IntegerField
 
 
 class Deposito(models.Model):
@@ -65,7 +65,10 @@ class Articulo(models.Model):
 
     @property
     def disponibilidad(self):
-        return self.movimientos_articulo.all().aggregate(Sum('cantidad'))['cantidad__sum']
+        return self.movimientos_articulo.all().annotate(
+            cant=ExpressionWrapper(
+                F('cantidad')*F('multiplicador'), output_field=IntegerField())
+        ).aggregate(Sum('cant'))['cant__sum']
 
     def __str__(self):
         return "{} - {}".format(

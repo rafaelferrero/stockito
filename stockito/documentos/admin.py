@@ -18,12 +18,13 @@ class MovimientoAdmin(admin.ModelAdmin):
             'fields': (
                 'articulo',
                 'cantidad',
+                'multiplicador',
                 )
         }),
     )
     list_display = (
         'articulo',
-        'cantidad',
+        'cantidad_comprometida',
     )
     list_filter = (
         'articulo',
@@ -34,6 +35,10 @@ class MovimientoAdmin(admin.ModelAdmin):
         'articulo__proveedor__razon_social',
         'articulo__proveedor__nombre_fantasia',
     )
+
+    def cantidad_comprometida(self, obj):
+        return obj.cantidad * obj.multiplicador
+    cantidad_comprometida.short_description = _('Cantidad')
 
 
 class IngresoInLIne(admin.TabularInline):
@@ -101,6 +106,7 @@ class DocumentoIngresoAdmin(admin.ModelAdmin):
 
 class EgresoInLIne(admin.TabularInline):
     model = Egreso
+    exclude = ['multiplicador']
 
 
 @admin.register(DocumentoEgreso)

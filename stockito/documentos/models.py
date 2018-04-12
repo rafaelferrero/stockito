@@ -1,11 +1,13 @@
-from django.db import models
-from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
-from entidades.models import Proveedor, Cliente
-from almacenes.models import Articulo
-from documentos.choices import LETRA
+from django.db import models
 from django.db.models import Sum
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+from almacenes.models import Articulo
+from entidades.models import Proveedor, Cliente
+from documentos.choices import LETRA
 
 
 class Documento(models.Model):
@@ -152,6 +154,8 @@ class Movimiento(models.Model):
     cantidad = models.PositiveSmallIntegerField(
         verbose_name=_("Cantidad"),
     )
+    # Por defecto el multiplicador es uno, o sea no produce cambio a la cantidad
+    #   al guardar un egreso, se reemplaza por -1 así sí produce cambios en la cantidad.
     multiplicador = models.SmallIntegerField(
         default=1,
         help_text=_("Si el multiplicador es positivo es un ingreso "
@@ -166,7 +170,7 @@ class Movimiento(models.Model):
     def __str__(self):
         return "{} cantidad: {}".format(
             self.articulo,
-            self.cantidad,
+            self.cantidad * self.multiplicador,
         )
 
 
@@ -198,7 +202,7 @@ class Egreso(Movimiento):
         verbose_name_plural = _("Egresos")
 
     def clean(self):
-        if not self.disponible:
+        if (self.articulo.disponibilidad - self.cantidad) < 0:
             raise ValidationError(
                 {'cantidad':
                  _("Este artículo no tiene stock disponible. "
