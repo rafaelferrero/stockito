@@ -1,9 +1,12 @@
-from django.db import models
-from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Sum
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from almacenes.models import Articulo
 from entidades.models import Proveedor, Cliente
-from almacenes.models import Movimiento
 from documentos.choices import LETRA
 
 
@@ -140,6 +143,37 @@ class DocumentoEgreso(Documento):
         )
 
 
+class Movimiento(models.Model):
+    articulo = models.ForeignKey(
+        Articulo,
+        verbose_name=_("Artículo"),
+        related_name="movimientos_articulo",
+        related_query_name="movimiento_articulo",
+        on_delete=models.PROTECT,
+    )
+    cantidad = models.PositiveSmallIntegerField(
+        verbose_name=_("Cantidad"),
+    )
+    # Por defecto el multiplicador es uno, o sea no produce cambio a la cantidad
+    #   al guardar un egreso, se reemplaza por -1 así sí produce cambios en la cantidad.
+    multiplicador = models.SmallIntegerField(
+        default=1,
+        help_text=_("Si el multiplicador es positivo es un ingreso "
+                    "y si es negativo es un egreso")
+    )
+
+    class Meta:
+        verbose_name = _("Movimiento")
+        verbose_name_plural = _("Movimientos")
+        ordering = ['articulo']
+
+    def __str__(self):
+        return "{} cantidad: {}".format(
+            self.articulo,
+            self.cantidad * self.multiplicador,
+        )
+
+
 class Ingreso(Movimiento):
     documento = models.ForeignKey(
         DocumentoIngreso,
@@ -167,7 +201,14 @@ class Egreso(Movimiento):
         verbose_name = _("Egreso")
         verbose_name_plural = _("Egresos")
 
+    def clean(self):
+        if (self.articulo.disponibilidad - self.cantidad) < 0:
+            raise ValidationError(
+                {'cantidad':
+                 _("Este artículo no tiene stock disponible. "
+                   "Tienes {} artículos disponibles".format(
+                     self.articulo.disponibilidad, ))})
+
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.cantidad = self.cantidad * (-1)
+        self.multiplicador = -1
         super(Movimiento, self).save(*args, **kwargs)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from entidades.models import Proveedor
+from django.db.models import Sum, F, ExpressionWrapper, IntegerField
 
 
 class Deposito(models.Model):
@@ -25,7 +26,7 @@ class Deposito(models.Model):
         ordering = ['identificacion']
 
     def __str__(self):
-        deposito=""
+        deposito = ""
         if self.deposito:
             deposito = " (en {})".format(self.deposito)
 
@@ -62,6 +63,13 @@ class Articulo(models.Model):
         verbose_name_plural = _("Artículos")
         ordering = ['codigo', 'proveedor']
 
+    @property
+    def disponibilidad(self):
+        return self.movimientos_articulo.all().annotate(
+            cant=ExpressionWrapper(
+                F('cantidad')*F('multiplicador'), output_field=IntegerField())
+        ).aggregate(Sum('cant'))['cant__sum']
+
     def __str__(self):
         return "{} - {}".format(
             self.codigo,
@@ -95,27 +103,3 @@ class Ubicacion(models.Model):
 
     def __str__(self):
         return "{}".format(self.ubicacion.identificacion)
-
-
-class Movimiento(models.Model):
-    articulo = models.ForeignKey(
-        Articulo,
-        verbose_name=_("Artículo"),
-        related_name="movimientos_articulo",
-        related_query_name="movimiento_articulo",
-        on_delete=models.PROTECT,
-    )
-    cantidad = models.SmallIntegerField(
-        verbose_name=_("Cantidad"),
-    )
-
-    class Meta:
-        verbose_name = _("Movimiento")
-        verbose_name_plural = _("Movimientos")
-        ordering = ['articulo']
-
-    def __str__(self):
-        return "{} cantidad: {}".format(
-            self.articulo,
-            self.cantidad,
-        )

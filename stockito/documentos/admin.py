@@ -5,7 +5,40 @@ from documentos.models import (
     Ingreso,
     DocumentoEgreso,
     Egreso,
+    Movimiento,
 )
+
+
+@admin.register(Movimiento)
+class MovimientoAdmin(admin.ModelAdmin):
+    actions_on_bottom = True
+    list_per_page = 25
+    fieldsets = (
+        (None, {
+            'fields': (
+                'articulo',
+                'cantidad',
+                'multiplicador',
+                )
+        }),
+    )
+    list_display = (
+        'articulo',
+        'cantidad_comprometida',
+    )
+    list_filter = (
+        'articulo',
+    )
+    search_fields = (
+        'articulo__codigo',
+        'articulo__descripcion',
+        'articulo__proveedor__razon_social',
+        'articulo__proveedor__nombre_fantasia',
+    )
+
+    def cantidad_comprometida(self, obj):
+        return obj.cantidad * obj.multiplicador
+    cantidad_comprometida.short_description = _('Cantidad')
 
 
 class IngresoInLIne(admin.TabularInline):
@@ -73,6 +106,7 @@ class DocumentoIngresoAdmin(admin.ModelAdmin):
 
 class EgresoInLIne(admin.TabularInline):
     model = Egreso
+    exclude = ['multiplicador']
 
 
 @admin.register(DocumentoEgreso)
