@@ -211,4 +211,4 @@ class Egreso(Movimiento):
 
     def save(self, *args, **kwargs):
         self.multiplicador = -1
-        super(Movimiento, self).save(*args, **kwargs)
+        super(Egreso, self).save(*args, **kwargs)
