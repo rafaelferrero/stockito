@@ -25,6 +25,7 @@ class MovimientoAdmin(admin.ModelAdmin):
     list_display = (
         'articulo',
         'cantidad_comprometida',
+        'comprobante',
     )
     list_filter = (
         'articulo',
@@ -39,6 +40,16 @@ class MovimientoAdmin(admin.ModelAdmin):
     def cantidad_comprometida(self, obj):
         return obj.cantidad * obj.multiplicador
     cantidad_comprometida.short_description = _('Cantidad')
+
+    def comprobante(self, obj):
+        try:
+            if hasattr(obj, 'ingreso'):
+                return obj.ingreso.documento
+            elif hasattr(obj, 'egreso'):
+                return obj.egreso.documento
+        except NotImplementedError:
+            return ""
+    comprobante.short_description = _('Comprobante')
 
 
 class IngresoInLIne(admin.TabularInline):
