@@ -28,7 +28,7 @@ class Deposito(models.Model):
     def __str__(self):
         deposito = ""
         if self.deposito:
-            deposito = " (en {})".format(self.deposito)
+            deposito = " > {}".format(self.deposito)
 
         return "{}{}".format(self.identificacion, deposito)
 

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import F, ExpressionWrapper, IntegerField, CharField
 from django.utils.translation import ugettext_lazy as _
 from documentos.models import (
     DocumentoIngreso,
@@ -26,6 +27,7 @@ class MovimientoAdmin(admin.ModelAdmin):
         'articulo',
         'cantidad_comprometida',
         'comprobante',
+        'fecha',
     )
     list_filter = (
         'articulo',
@@ -37,8 +39,17 @@ class MovimientoAdmin(admin.ModelAdmin):
         'articulo__proveedor__nombre_fantasia',
     )
 
+    def get_queryset(self, request):
+        qs = super(MovimientoAdmin, self).get_queryset(request)
+        qs = qs.annotate(
+            Cantidad=ExpressionWrapper(
+                F('cantidad')*F('multiplicador'),
+                output_field=IntegerField())).order_by('cantidad')
+        return qs
+
     def cantidad_comprometida(self, obj):
-        return obj.cantidad * obj.multiplicador
+        return obj.Cantidad
+    cantidad_comprometida.admin_order_field = 'Cantidad'
     cantidad_comprometida.short_description = _('Cantidad')
 
     def comprobante(self, obj):
@@ -50,6 +61,16 @@ class MovimientoAdmin(admin.ModelAdmin):
         except NotImplementedError:
             return ""
     comprobante.short_description = _('Comprobante')
+
+    def fecha(self, obj):
+        try:
+            if hasattr(obj, 'ingreso'):
+                return obj.ingreso.documento.fecha
+            elif hasattr(obj, 'egreso'):
+                return obj.egreso.documento.fecha
+        except NotImplementedError:
+            return ""
+    fecha.short_description = _('Fecha')
 
 
 class IngresoInLIne(admin.TabularInline):

@@ -39,6 +39,11 @@ class DocumentoIngreso(Documento):
         null=True,
         on_delete=models.SET_NULL,
     )
+    nro_ingreso = models.PositiveIntegerField(
+        default=1,
+        verbose_name=_("Número Documento de Ingreso"),
+        unique=True,
+    )
     letra = models.CharField(
         max_length=1,
         choices=LETRA,
@@ -72,7 +77,7 @@ class DocumentoIngreso(Documento):
     class Meta:
         verbose_name = _("Documento Ingreso")
         verbose_name_plural = _("Documentos de Ingreso")
-        ordering = ['-fecha', 'proveedor']
+        ordering = ['-nro_ingreso', '-fecha', 'proveedor']
 
     def __str__(self):
         if not self.punto_venta:
@@ -82,14 +87,16 @@ class DocumentoIngreso(Documento):
 
         valor = ''
         if self.letra and self.punto_venta and self.numero:
-            valor = "Factura {} {}-{} del ".format(
+            valor = "Factura: {} {}-{} ".format(
                 self.letra,
                 "0" * (4 - len(self.punto_venta.strip())) + self.punto_venta.strip(),
                 "0" * (8 - len(self.numero.strip())) + self.numero.strip(),
             )
 
-        return valor + "{} ({})".format(
+        return "Ingreso Nr. {} Fecha:{} {} - {}".format(
+            self.nro_ingreso,
             self.fecha,
+            valor,
             self.proveedor,
         )
 
@@ -111,6 +118,11 @@ class DocumentoIngreso(Documento):
                    " no omita la letra de la misma")})
 
     def save(self, *args, **kwargs):
+        if self.id is None:
+            try:
+                self.nro_ingreso = 1 + DocumentoIngreso.objects.all().order_by('-nro_ingreso')[0]
+            except IndexError:
+                pass
         if not self.punto_venta and not self.numero:
             self.letra = ''
         super(DocumentoIngreso, self).save(*args, **kwargs)
@@ -130,6 +142,11 @@ class DocumentoEgreso(Documento):
         verbose_name=_("Motivo"),
         help_text=_("Motivo de la extracción"),
     )
+    nro_egreso = models.PositiveIntegerField(
+        default=1,
+        verbose_name=_("Número Documento de Egreso"),
+        unique=True,
+    )
 
     class Meta:
         verbose_name = _("Documento Egreso")
@@ -137,10 +154,19 @@ class DocumentoEgreso(Documento):
         ordering = ['-fecha', 'cliente']
 
     def __str__(self):
-        return "{} {}".format(
-            self.cliente,
+        return "Egreso Nr. {} Fecha: {} - {}".format(
+            self.nro_egreso,
             self.fecha,
+            self.cliente,
         )
+
+    def save(self, *args, **kwargs):
+        if self.id is None:
+            try:
+                self.nro_egreso = 1 + DocumentoEgreso.objects.all().order_by('-nro_egreso')[0]
+            except IndexError:
+                pass
+        super(DocumentoEgreso, self).save(*args, **kwargs)
 
 
 class Movimiento(models.Model):
